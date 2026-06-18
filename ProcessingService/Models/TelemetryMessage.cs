@@ -1,5 +1,10 @@
 ﻿namespace ProcessingService.Models
 {
+    /// <summary>
+    /// Lightweight representation of incoming telemetry messages deserialized from Kafka.
+    /// Fields mirror the external telemetry schema; nullables are used when telemetry data
+    /// may be absent.
+    /// </summary>
     public class TelemetryMessage
     {
         public string Icao24 { get; set; }
