@@ -7,13 +7,13 @@
     public class ProcessedState
     {
         /// <summary>Unique flight identifier (ICAO 24-bit address).</summary>
-        public string FlightId { get; set; }   // map from Icao24
+        public string? FlightId { get; set; }   // map from Icao24
 
         /// <summary>Human-readable callsign if available.</summary>
-        public string Callsign { get; set; }
+        public string? Callsign { get; set; }
 
         /// <summary>Declared origin country of the aircraft.</summary>
-        public string OriginCountry { get; set; }
+        public string? OriginCountry { get; set; }
 
         /// <summary>Latitude in decimal degrees.</summary>
         public double Lat { get; set; }
@@ -30,5 +30,4 @@
         /// <summary>Processing timestamp in UTC.</summary>
         public DateTime Timestamp { get; set; }
     }
-
 }

@@ -1,8 +1,5 @@
 ﻿using ProcessingService.Models;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System;
-using Microsoft.Extensions.Logging;
 
 namespace ProcessingService.Services
 {
@@ -47,7 +44,7 @@ namespace ProcessingService.Services
         public async Task ProcessAsync(string rawJson)
         {
             // Optionally archive raw payloads for forensic analysis or reprocessing.
-            //await _archive.AppendRawAsync(rawJson);
+            await _archive.AppendRawAsync(rawJson);
 
             // Deserialize into the lightweight telemetry model. If the message cannot be
             // parsed, drop it and move on to avoid blocking the pipeline.
@@ -74,19 +71,19 @@ namespace ProcessingService.Services
             // History indexing and finance/event generation are optional and may be enabled
             // depending on the deployment requirements. Keep these operations async to avoid
             // blocking the critical live-path write.
-            //await _os.IndexAsync(processed);
+            await _os.IndexAsync(processed);
 
             // Example finance event generation based on business rules.
-            //if (processed.Speed > 900)
-            //{
-            //    await _pg.InsertEventAsync(new FinanceEvent
-            //    {
-            //        FlightId = processed.FlightId,
-            //        EventType = "SPEED_ANOMALY",
-            //        Timestamp = processed.Timestamp,
-            //        Payload = JsonSerializer.Serialize(processed)
-            //    });
-            //}
+            if (processed.Speed > 900)
+            {
+                await _pg.InsertEventAsync(new FinanceEvent
+                {
+                    FlightId = processed.FlightId,
+                    EventType = "SPEED_ANOMALY",
+                    Timestamp = processed.Timestamp,
+                    Payload = JsonSerializer.Serialize(processed)
+                });
+            }
         }
     }
 }

@@ -11,7 +11,7 @@ namespace ProcessingService.Services
         public ArchiveWriter(IAmazonS3 s3, IConfiguration config)
         {
             _s3 = s3;
-            _bucket = config["S3:Bucket"];
+            _bucket = config["S3:BucketName"];
         }
 
         public async Task AppendRawAsync(string rawJson)

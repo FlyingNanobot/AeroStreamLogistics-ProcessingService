@@ -26,8 +26,8 @@ builder.Services.AddSingleton<PostgresWriter>();
 builder.Services.AddSingleton<IAmazonS3>(sp =>
     new AmazonS3Client(
         builder.Configuration["S3:AccessKey"],
-        builder.Configuration["S3:SecretKey"],
-        RegionEndpoint.APSouth1
+        builder.Configuration["S3:SecretAccessKey"],
+        RegionEndpoint.APSoutheast2
     )
 );
 builder.Services.AddSingleton<ArchiveWriter>();
