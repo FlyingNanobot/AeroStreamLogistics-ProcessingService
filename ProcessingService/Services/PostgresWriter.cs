@@ -5,32 +5,42 @@ namespace ProcessingService.Services
 {
     public class PostgresWriter
     {
-        private readonly string _connectionString;
+        private readonly string _connString;
         private readonly ILogger<PostgresWriter> _logger;
 
         public PostgresWriter(IConfiguration config, ILogger<PostgresWriter> logger)
         {
-            _connectionString = config.GetConnectionString("Postgres");
+            _connString = config["Postgres:ConnectionString"];
             _logger = logger;
         }
 
-        public async Task InsertEventAsync(FinanceEvent evt)
+        public async Task WriteAsync(ProcessedState state)
         {
-            const string sql = @"
-            INSERT INTO finance_events (flight_id, event_type, timestamp, payload)
-            VALUES (@flight_id, @event_type, @timestamp, @payload);
-        ";
-
-            await using var conn = new NpgsqlConnection(_connectionString);
+            await using var conn = new NpgsqlConnection(_connString);
             await conn.OpenAsync();
 
-            await using var cmd = new NpgsqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("flight_id", evt.FlightId);
-            cmd.Parameters.AddWithValue("event_type", evt.EventType);
-            cmd.Parameters.AddWithValue("timestamp", evt.Timestamp);
-            cmd.Parameters.AddWithValue("payload", evt.Payload);
+            var sql = @"INSERT INTO processed_state 
+                    (flight_id, callsign, origin_country, lat, lon, alt, speed, timestamp) 
+                    VALUES (@f, @c, @o, @lat, @lon, @alt, @speed, @ts)";
 
-            await cmd.ExecuteNonQueryAsync();
+            await using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("f", state.FlightId ?? "");
+            cmd.Parameters.AddWithValue("c", state.Callsign ?? "");
+            cmd.Parameters.AddWithValue("o", state.OriginCountry ?? "");
+            cmd.Parameters.AddWithValue("lat", state.Lat);
+            cmd.Parameters.AddWithValue("lon", state.Lon);
+            cmd.Parameters.AddWithValue("alt", state.Alt);
+            cmd.Parameters.AddWithValue("speed", state.Speed);
+            cmd.Parameters.AddWithValue("ts", state.Timestamp);
+
+            try
+            {
+                await cmd.ExecuteNonQueryAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to insert telemetry into Postgres");
+            }
         }
     }
 

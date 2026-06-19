@@ -74,15 +74,9 @@ namespace ProcessingService.Services
             await _os.IndexAsync(processed);
 
             // Example finance event generation based on business rules.
-            if (processed.Speed > 900)
+            if (processed.Speed > 1)
             {
-                await _pg.InsertEventAsync(new FinanceEvent
-                {
-                    FlightId = processed.FlightId,
-                    EventType = "SPEED_ANOMALY",
-                    Timestamp = processed.Timestamp,
-                    Payload = JsonSerializer.Serialize(processed)
-                });
+                await _pg.WriteAsync(processed);
             }
         }
     }

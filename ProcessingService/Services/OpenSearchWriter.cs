@@ -18,7 +18,7 @@ namespace ProcessingService.Services
         {
             var response = await _client.IndexAsync(state, i => i
                 .Index("telemetry-history")
-                .Id($"{state.FlightId}-{state.Timestamp:O}")
+                .Id($"{state.FlightId}-{state.Timestamp:yyyyMMdd-HHmmssfff}")
             );
 
             if (!response.IsValid)
